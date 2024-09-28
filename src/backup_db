@@ -1,0 +1,42 @@
+#!/bin/bash
+
+DB_CONTAINER_NAME="netology-devops-example-python-db-1"
+# DB_USER="app"
+# DB_PASSWORD="QwErTy1234"
+DB_USER="root"
+DB_PASSWORD="YtReWq4321"
+DB_NAME="virtd"
+NETWORK="netology-devops-example-python_backend"
+
+# Директория для резервного копирования
+BACKUP_DIR="/opt/backup"
+
+# Дата и время резервного копирования
+DATE=$(date +"%Y%m%d%H%M")
+
+# Имя файла
+BACKUP_FILE="db_backup_$DATE.sql"
+
+# Полный путь к файлу на хосте
+HOST_BACKUP_FILE="$BACKUP_DIR/$BACKUP_FILE"
+
+# Создаем директорию для резервного копирования, если она не существует
+mkdir -p $BACKUP_DIR
+
+# Резервное копирование базы данных
+# docker run --rm --network ${NETWORK} schnitzler/mysqldump \
+#     -h${DB_CONTAINER_NAME} -u${DB_USER} -p${DB_PASSWORD} ${DB_NAME} > $BACKUP_FILE
+
+docker run --rm --entrypoint "" \
+    -v $BACKUP_DIR:/backup \
+    --network ${NETWORK} \
+    schnitzler/mysqldump \
+    mysqldump --opt -h $DB_CONTAINER_NAME -u$DB_USER -p$DB_PASSWORD --result-file=/backup/$BACKUP_FILE $DB_NAME
+
+# Проверка успешности резервного копирования
+if [ $? -eq 0 ]; then
+    echo "Резервное копирование успешно завершено. Файл: $BACKUP_FILE"
+else
+    echo "Ошибка при создании резервной копии."
+    exit 1
+fi

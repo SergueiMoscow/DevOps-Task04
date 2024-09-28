@@ -1,0 +1,16 @@
+#!/bin/bash
+export VM_NAME="netology-task4-4"
+export YC_SUBNET_ID="e9bsl2o51eg78tjo00vm"
+export YC_ZONE="ru-central1-a"
+
+yc compute instance create \
+  --name $VM_NAME \
+  --hostname $VM_NAME \
+  --zone=$YC_ZONE \
+  --create-boot-disk size=20GB,image-folder-id=standard-images,image-family=centos-7 \
+  --cores=2 \
+  --memory=2G \
+  --core-fraction=20 \
+  --preemptible \
+  --network-interface subnet-id=$YC_SUBNET_ID,ipv4-address=auto,nat-ip-version=ipv4 \
+  --ssh-key ~/.ssh/id_ed25519.pub
